@@ -8,22 +8,50 @@ fn main() {
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
     match &cli_args.command {
-        Some(Commands::Test { list }) => {
-            if *list {
-                println!("Printing testing lists...");
+        Some(Commands::Add {
+            service,
+            username,
+            email,
+            password,
+        }) => {
+            println!(
+                "Adding new password for service '{}', username '{}', email '{}', password '{}'",
+                service,
+                username.as_deref().unwrap_or("None"),
+                email,
+                password
+            );
+        }
+        Some(Commands::Get { get }) => {
+            if *get {
+                println!("Getting password...");
             } else {
-                println!("Not printing testing lists...");
+                println!("Not getting password...");
             }
         }
-        Some(Commands::Add { add }) => {
-            if *add {
-                println!("Adding new password...");
+        Some(Commands::GetAll {}) => {
+            println!("Getting all passwords..., this is a test");
+        }
+        Some(Commands::Update { update }) => {
+            if *update {
+                println!("Updating password...");
             } else {
-                println!("Not adding new password...");
+                println!("Not updating password...");
             }
         }
-        Some(_) => {
-            println!("Not implemented yet...");
+        Some(Commands::Remove { remove }) => {
+            if *remove {
+                println!("Removing  password...");
+            } else {
+                println!("Not removing password...");
+            }
+        }
+        Some(Commands::Generate { generate }) => {
+            if *generate {
+                println!("Generating password...");
+            } else {
+                println!("Not generating password...");
+            }
         }
         None => {}
     }
