@@ -1,9 +1,16 @@
 mod cli;
+mod storage;
 use clap::Parser;
 use cli::{Cli, Commands};
+use storage::Storage;
+// use uuid::Uuid;
 fn main() {
     let cli_args = Cli::parse();
     println!("Hello, world!");
+
+    let storage = Storage::new();
+
+    println!("{:?}", storage);
 
     // You can check for the existence of subcommands, and if found use their
     // matches just as you would the top level cmd
