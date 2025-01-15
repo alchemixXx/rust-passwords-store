@@ -1,7 +1,17 @@
 mod cli;
+mod custom_result;
+mod storage;
+
 use clap::Parser;
 use cli::{Cli, Commands};
-fn main() {
+use custom_result::CustomResult;
+use storage::Storage;
+// use uuid::Uuid;
+fn main() -> CustomResult<()> {
+    // let secret_key: &str = "very_secret_key";
+    let path: &str = "src/data/data.json";
+    let storage = Storage::new(path);
+
     let cli_args = Cli::parse();
     println!("Hello, world!");
 
@@ -27,4 +37,5 @@ fn main() {
         }
         None => {}
     }
+    Ok(())
 }
