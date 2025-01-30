@@ -7,7 +7,9 @@ pub enum CustomError {
     UnknownBranch,
     ConfigParsingError(String),
     NpmConfigError(String),
-    VersionBuild(String),
+    WrongSecretParams(String),
+    CipherError(String),
+    DerivingKeyError(String),
     MissingFile,
 }
 
