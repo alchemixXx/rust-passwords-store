@@ -6,17 +6,17 @@ use chacha20poly1305::{ChaCha20Poly1305, Key, KeyInit, Nonce};
 use crate::custom_result::{CustomError, CustomResult};
 
 pub struct Encrypt {
-    master_pass: &'static str,
-    salt: &'static str,
+    master_pass: String,
+    salt: String,
 }
 
 impl Encrypt {
-    pub fn new(master_pass: &'static str, salt: &'static str) -> Self {
+    pub fn new(master_pass: String, salt: String) -> Self {
         Encrypt { master_pass, salt }
     }
     pub fn encrypt(&self, plaintext: &str) -> CustomResult<String> {
         let key = self.derive_key()?;
-        let nonce = hex::decode(self.salt)
+        let nonce = hex::decode(self.salt.as_str())
             .map_err(|err| CustomError::WrongSecretParams(err.to_string()))?;
 
         if nonce.len() != 12 || key.len() != 32 {
@@ -41,7 +41,7 @@ impl Encrypt {
     pub fn decrypt(&self, ciphertext: &str) -> CustomResult<String> {
         let key = self.derive_key()?;
         // Ensure the key and IV are the correct length
-        let nonce = hex::decode(self.salt)
+        let nonce = hex::decode(self.salt.as_str())
             .map_err(|err| CustomError::WrongSecretParams(err.to_string()))?;
 
         if nonce.len() != 12 || key.len() != 32 {
@@ -96,7 +96,7 @@ mod tests {
     fn test_encrypt() {
         let secret_key = "hello";
         let salt = "000102030405060708090a0b"; // 12 bytes
-        let crypter = Encrypt::new(secret_key, salt);
+        let crypter = Encrypt::new(secret_key.to_string(), salt.to_string());
         let encrypted = crypter.encrypt("Hello, Rust!");
         assert_eq!(
             encrypted,
@@ -108,7 +108,7 @@ mod tests {
     fn test_decrypt() {
         let secret_key = "hello";
         let salt = "000102030405060708090a0b"; // 12 bytes
-        let crypter = Encrypt::new(secret_key, salt);
+        let crypter = Encrypt::new(secret_key.to_string(), salt.to_string());
         let encrypted = crypter.decrypt("5957d9925131b10b1cdaeeac176c0b89ea43f379e8942ef4fb95bb91");
         assert_eq!(encrypted, Ok("Hello, Rust!".to_string()));
     }
@@ -117,7 +117,7 @@ mod tests {
     fn test_encrypt_wrong_salt_len() {
         let secret_key = "hello";
         let salt = "000102030405060708090a0b11";
-        let crypter = Encrypt::new(secret_key, salt);
+        let crypter = Encrypt::new(secret_key.to_string(), salt.to_string());
         let encrypted = crypter.encrypt("Hello, Rust!");
         assert_eq!(
             encrypted,
@@ -131,7 +131,7 @@ mod tests {
     fn test_decrypt_wrong_salt_len() {
         let secret_key = "hello";
         let salt = "000102030405060708090a0b11";
-        let crypter = Encrypt::new(secret_key, salt);
+        let crypter = Encrypt::new(secret_key.to_string(), salt.to_string());
         let encrypted = crypter.decrypt("5957d9925131b10b1cdaeeac176c0b89ea43f379e8942ef4fb95bb91");
         assert_eq!(
             encrypted,
@@ -145,7 +145,7 @@ mod tests {
     fn test_encrypt_odd_salt_len() {
         let secret_key = "hello";
         let salt = "000102030405060708090a0b1";
-        let crypter = Encrypt::new(secret_key, salt);
+        let crypter = Encrypt::new(secret_key.to_string(), salt.to_string());
         let encrypted = crypter.encrypt("Hello, Rust!");
         assert_eq!(
             encrypted,
@@ -159,7 +159,7 @@ mod tests {
     fn test_decrypt_odd_salt_len() {
         let secret_key = "hello";
         let salt = "000102030405060708090a0b1";
-        let crypter = Encrypt::new(secret_key, salt);
+        let crypter = Encrypt::new(secret_key.to_string(), salt.to_string());
         let encrypted = crypter.decrypt("5957d9925131b10b1cdaeeac176c0b89ea43f379e8942ef4fb95bb91");
         assert_eq!(
             encrypted,
