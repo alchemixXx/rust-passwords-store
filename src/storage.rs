@@ -15,15 +15,15 @@ pub struct PasswordEntity {
 
 #[derive(Debug)]
 pub struct Storage {
-    path: &'static str,
+    path: String,
 }
 
 impl Storage {
-    pub fn new(path: &'static str) -> Self {
+    pub fn new(path: String) -> Self {
         Storage { path }
     }
     pub fn load_data(&self) -> CustomResult<Vec<PasswordEntity>> {
-        let data_str = fs::read_to_string(Path::new(self.path)).map_err(|err| {
+        let data_str = fs::read_to_string(Path::new(self.path.as_str())).map_err(|err| {
             println!("{:?}", err);
             CustomError::CommandExecution("Error reading file".to_string())
         })?;
@@ -40,7 +40,7 @@ impl Storage {
             println!("{:?}", err);
             CustomError::CommandExecution("Error serializing data".to_string())
         })?;
-        fs::write(Path::new(self.path), data_str).map_err(|err| {
+        fs::write(Path::new(self.path.as_str()), data_str).map_err(|err| {
             println!("{:?}", err);
             CustomError::CommandExecution("Error writing data to file".to_string())
         })?;
@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn test_load_dat_0_records() {
         let path = "src/data/test_1_data.json";
-        let storage = Storage::new(path);
+        let storage = Storage::new(path.to_string());
         let insert = storage.save_data(vec![]);
         assert_eq!(insert, Ok(()));
         let data = storage.load_data();
@@ -75,7 +75,7 @@ mod tests {
             login: "username_here".to_string(),
             comment: None,
         };
-        let storage = Storage::new(path);
+        let storage = Storage::new(path.to_string());
         let insert = storage.save_data(vec![record.clone()]);
         assert_eq!(insert, Ok(()));
         let data = storage.load_data();
@@ -86,7 +86,7 @@ mod tests {
     #[test]
     fn test_save_missing_file() {
         let path = "src/data/test_3_data.json";
-        let storage = Storage::new(path);
+        let storage = Storage::new(path.to_string());
         let exists = fs::exists(path).unwrap();
         assert!(!exists);
         let insert = storage.save_data(vec![]);
@@ -99,7 +99,7 @@ mod tests {
     #[test]
     fn test_save_1_record_to_file() {
         let path = "src/data/test_4_data.json";
-        let storage = Storage::new(path);
+        let storage = Storage::new(path.to_string());
         let insert = storage.save_data(vec![]);
         assert_eq!(insert, Ok(()));
         let record = PasswordEntity {
